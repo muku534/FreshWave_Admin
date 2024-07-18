@@ -1,3 +1,7 @@
+"use client"
+
+import * as React from "react";
+import { useTheme } from "next-themes";
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -11,17 +15,9 @@ import {
     Users2,
     CircleUser,
     Menu,
+    Moon, Sun
 
 } from "lucide-react"
-
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -39,13 +35,9 @@ import {
     TooltipTrigger,
     TooltipProvider,
 } from "@/components/ui/tooltip"
-import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage,
-} from "@/components/ui/avatar"
 
-export default function Navbar() {
+const Navbar = () => {
+    const { setTheme } = useTheme();
     return (
         <div className="flex w-full flex-col bg-muted/40">
             <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
@@ -145,10 +137,9 @@ export default function Navbar() {
                     </TooltipProvider>
                 </nav>
             </aside>
-            <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-                <header className="sticky top-0 flex h-14 lg:h-12 lg:pb-3 items-center gap-4 border-b bg-background px-4 md:px-6">
+            <div className="flex flex-col sm:gap-4 sm:py-4 sm:pt-0 sm:pl-14">
+                <header className="sticky top-0 flex h-14 lg:h-13  items-center gap-4 border-b bg-background px-4 md:px-6">
                     <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
-
                         <Link
                             href="/"
                             className="text-foreground transition-colors hover:text-foreground"
@@ -243,6 +234,26 @@ export default function Navbar() {
                         </form>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="icon">
+                                    <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                                    <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                                    <span className="sr-only">Toggle theme</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => setTheme("light")}>
+                                    Light
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                                    Dark
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setTheme("system")}>
+                                    System
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
                                 <Button variant="secondary" size="icon" className="rounded-full">
                                     <CircleUser className="h-5 w-5" />
                                     <span className="sr-only">Toggle user menu</span>
@@ -263,3 +274,5 @@ export default function Navbar() {
         </div>
     )
 }
+
+export default Navbar;
