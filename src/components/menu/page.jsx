@@ -35,9 +35,17 @@ import {
     TooltipTrigger,
     TooltipProvider,
 } from "@/components/ui/tooltip"
+import { useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
+import { auth } from "@/app/firebase";
 
-const Navbar = () => {
+const Navbar = ({ onLogout }) => {
     const { setTheme } = useTheme();
+
+    const router = useRouter();
+
+
+
     return (
         <div className="flex w-full flex-col bg-muted/40">
             <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
@@ -265,7 +273,7 @@ const Navbar = () => {
                                 <DropdownMenuItem>Settings</DropdownMenuItem>
                                 <DropdownMenuItem>Support</DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem>Logout</DropdownMenuItem>
+                                <DropdownMenuItem onClick={onLogout}>Logout</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
