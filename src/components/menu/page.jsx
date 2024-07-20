@@ -38,13 +38,11 @@ import {
 import { useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { auth } from "@/app/firebase";
+import { useAuth } from "../AuthProvider";
 
 const Navbar = ({ onLogout }) => {
     const { setTheme } = useTheme();
-
-    const router = useRouter();
-
-
+    const { user, handleLogout } = useAuth();
 
     return (
         <div className="flex w-full flex-col bg-muted/40">
@@ -230,7 +228,7 @@ const Navbar = ({ onLogout }) => {
                         </SheetContent>
                     </Sheet>
                     <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-                        <form className="ml-auto pt-5 flex-1 sm:flex-initial">
+                        <form className="ml-auto  flex-1 sm:flex-initial">
                             <div className="relative">
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                                 <Input
@@ -268,12 +266,13 @@ const Navbar = ({ onLogout }) => {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>  {user.firstName} {user.lastName}</DropdownMenuLabel>
                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>Settings</DropdownMenuItem>
                                 <DropdownMenuItem>Support</DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={onLogout}>Logout</DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

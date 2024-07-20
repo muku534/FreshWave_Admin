@@ -1,11 +1,13 @@
-// components/AuthProvider.js or components/AuthProvider.tsx
 'use client';
 
-import React, { useEffect, useState, ReactNode } from 'react';
+import React, { useEffect, useState, useContext, createContext } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/app/firebase';
 import { useRouter } from 'next/navigation';
+import Signin from '@/app/Signin/page';
+
+const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
@@ -59,9 +61,15 @@ export default function AuthProvider({ children }) {
         }
     };
 
+    if (!user) {
+        return <Signin />;
+    }
+
     return (
-        <div>
-            {React.cloneElement(children, { onLogout: handleLogout })}
-        </div>
+        <AuthContext.Provider value={{ user, loading, handleLogout }}>
+            {children}
+        </AuthContext.Provider>
     );
 }
+
+export const useAuth = () => useContext(AuthContext);
