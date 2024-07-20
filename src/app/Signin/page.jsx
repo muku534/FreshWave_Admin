@@ -25,23 +25,40 @@ export default function Signin() {
 
     const handleSignIn = async () => {
         setError("");
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const token = await userCredential.user.getIdToken();
-            localStorage.setItem("token", token);
-            setTimeout(() => {
-                router.push('/');
-            }, 1000);
-            toast.success("Login Successfully");
-        } catch (error) {
-            setError(error.message);
-            toast.error("invalid credential");
+
+        // Validate input fields
+        if (!email || !password) {
+            toast.error("Please fill in both email and password.");
+            return;
         }
+        toast.promise(
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    return userCredential.user.getIdToken();
+                })
+                .then((token) => {
+                    localStorage.setItem("token", token);
+                    setTimeout(() => {
+                        router.push('/');
+                    }, 1000);
+                }),
+            {
+                loading: 'Signing in...',
+                success: <b>Login Successfully</b>,
+                error: (err) => {
+                    setError(err.message);  // Set the error message
+                    return <b>{err.message === 'Firebase: Error (auth/invalid-credential).' ? 'invalid-credential' : 'Network issue'}</b>; // Display the error message in the toast
+                }
+            }
+        ).catch((error) => {
+            setError(error.message);  // Ensure the error state is set
+        });
     };
+
     return (
-        <div className="mt-28">
+        <div className="flex items-center justify-center min-h-screen">
             <Toaster
-                position="top-right"
+                position="top-center"
                 reverseOrder={false}
             />
             <Card className="mx-auto max-w-sm">
@@ -80,12 +97,12 @@ export default function Signin() {
                         </Button>
 
                     </div>
-                    <div className="mt-4 text-center text-sm">
+                    {/** <div className="mt-4 text-center text-sm">
                         Don&apos;t have an account?{" "}
                         <Link href="/Signup" className="underline">
                             Sign up
                         </Link>
-                    </div>
+                    </div>  */}
                 </CardContent>
             </Card>
         </div>
