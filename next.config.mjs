@@ -9,6 +9,9 @@ const nextConfig = {
         FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
         FIREBASE_MEASUREMENT_ID: process.env.FIREBASE_MEASUREMENT_ID
     },
+    images: {
+        domains: ['firebasestorage.googleapis.com'],
+    },
 };
 
 export default nextConfig;

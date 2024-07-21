@@ -12,11 +12,10 @@ const AuthContext = createContext();
 export default function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
-    const [redirectTo, setRedirectTo] = useState(null);
     const router = useRouter();
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+        const checkUserAuth = async (currentUser) => {
             if (currentUser) {
                 try {
                     const userDoc = await getDoc(doc(db, 'admins', currentUser.uid));
@@ -24,28 +23,29 @@ export default function AuthProvider({ children }) {
 
                     if (userData?.role === 'admin') {
                         setUser({ ...currentUser, ...userData });
-                        setRedirectTo('/');
+                        router.replace('/');
                     } else {
-                        setRedirectTo('/Signin');
+                        router.replace('/Signin');
                     }
                 } catch (error) {
                     console.error('Error checking user role:', error);
-                    setRedirectTo('/Signin');
+                    router.replace('/Signin');
+                } finally {
+                    setLoading(false);
                 }
             } else {
-                setRedirectTo('/Signin');
+                router.replace('/Signin');
+                setLoading(false);
             }
-            setLoading(false);
+        };
+
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setLoading(true);
+            checkUserAuth(currentUser);
         });
 
         return () => unsubscribe();
     }, [router]);
-
-    useEffect(() => {
-        if (redirectTo) {
-            router.replace(redirectTo);
-        }
-    }, [redirectTo, router]);
 
     if (loading) {
         return <p>Loading...</p>;

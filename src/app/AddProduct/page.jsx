@@ -42,6 +42,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
+import toast from 'react-hot-toast';
 
 const AddProduct = () => {
     const [admin, setAdmin] = useState('');
@@ -57,8 +58,6 @@ const AddProduct = () => {
     const [subcategory, setSubcategory] = useState('');
     const [status, setStatus] = useState('');
     const [imageSrc, setImageSrc] = useState([]);
-    const initialImage = '';
-
 
     const config = {
         borderRadius: '8px',
@@ -71,15 +70,20 @@ const AddProduct = () => {
     };
 
 
-    const handleImageChange = (newImage) => {
+    const handleImageChange = async (newImage) => {
         if (newImage && newImage !== '') {
             console.log('New image added:', newImage);
-            setImageSrc([...imageSrc, newImage]);
+            // Create a blob from the base64 image
+            const blob = await fetch(newImage).then(r => r.blob());
+            // Upload the blob to Firebase Storage
+            const storageRef = ref(storage, `images/${Date.now()}`);
+            const snapshot = await uploadBytes(storageRef, blob);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+            setImageSrc([...imageSrc, downloadURL]);
         } else {
             console.log('Invalid image data:', newImage);
         }
     };
-
 
 
     const handleDeleteImage = (index) => {
@@ -88,10 +92,6 @@ const AddProduct = () => {
     };
 
     const saveProduct = async () => {
-        if (!admin) {
-            alert("login first.");
-            return;
-        }
         try {
             // Store product data in the 'products' collection
             const productData = {
@@ -117,13 +117,16 @@ const AddProduct = () => {
                 category,
                 subcategory,
                 status,
+                imageSrc
             };
 
             // Add product document to the 'products' collection
-            const productRef = await addDoc(collection(db, 'products'), productData);
+            await addDoc(collection(db, 'products'), productData);
             clearForm();
+            toast.success('Product saved successfully.')
         } catch (error) {
             console.error('Error saving product:', error);
+            toast.error('Error saving product')
         }
     };
 
