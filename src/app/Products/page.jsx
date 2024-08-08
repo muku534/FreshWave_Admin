@@ -45,8 +45,9 @@ import {
 
 import banner from '../../../public/assets/images/banner.jpg'
 import { useEffect, useState } from "react"
-import { collection, getDoc, getDocs } from "firebase/firestore"
+import { collection, deleteDoc, doc, getDoc, getDocs } from "firebase/firestore"
 import { db } from "../firebase"
+import toast, { Toaster } from "react-hot-toast"
 
 export default function Products() {
 
@@ -68,9 +69,28 @@ export default function Products() {
         fetchProducts();
     }, []);
 
+    const deleteProduct = async (productId) => {
+        try {
+            const productRef = doc(db, 'products', productId); // Reference to the specific product document
+
+            await deleteDoc(productRef); // Delete the document
+
+            toast.success('Product deleted successfully.'); // Display success message
+            // Update the local state by removing the deleted product
+            setProducts((prevProducts) => prevProducts.filter(product => product.id !== productId));
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            toast.error('Error deleting product'); // Display error message
+        }
+    };
+
 
     return (
         <div className="flex w-full flex-col bg-muted/40">
+            <Toaster
+                position="top-center"
+                reverseOrder={false}
+            />
             <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
                 <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
                     <Tabs defaultValue="all">
@@ -188,7 +208,7 @@ export default function Products() {
                                                             <DropdownMenuContent align="end">
                                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                                 <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                                <DropdownMenuItem>Delete</DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => deleteProduct(item.id)}>Delete</DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>
                                                     </TableCell>

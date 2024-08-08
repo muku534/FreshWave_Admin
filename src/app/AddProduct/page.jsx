@@ -42,7 +42,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 
 const AddProduct = () => {
     const [admin, setAdmin] = useState('');
@@ -92,6 +92,11 @@ const AddProduct = () => {
     };
 
     const saveProduct = async () => {
+        // Validate input fields
+        if (!name || !description || !imageSrc) {
+            toast.error("Please fill all fileds.");
+            return;
+        }
         try {
             // Store product data in the 'products' collection
             const productData = {
@@ -118,11 +123,9 @@ const AddProduct = () => {
                 subcategory,
                 status,
                 imageSrc,
-             
-
             };
 
-            toast.promise(
+            await toast.promise(
                 addDoc(collection(db, 'products'), productData),
                 {
                     loading: 'Saving product...',
@@ -130,13 +133,14 @@ const AddProduct = () => {
                     error: 'Error saving product'
                 }
             );
-            clearForm();
-            toast.success('Product saved successfully.')
+
+            clearForm(); // Clear the form only after successful save
         } catch (error) {
             console.error('Error saving product:', error);
-            toast.error('Error saving product')
+            // You can add additional error handling here if needed
         }
     };
+
 
 
     const clearForm = () => {
@@ -160,6 +164,10 @@ const AddProduct = () => {
 
     return (
         <div className="flex min-h-screen w-full flex-col bg-muted/40">
+            <Toaster
+                position="top-center"
+                reverseOrder={false}
+            />
             <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
                 <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
                     <div className="grid max-w-full flex-1 auto-rows-max gap-4">
