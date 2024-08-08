@@ -117,11 +117,19 @@ const AddProduct = () => {
                 category,
                 subcategory,
                 status,
-                imageSrc
+                imageSrc,
+             
+
             };
 
-            // Add product document to the 'products' collection
-            await addDoc(collection(db, 'products'), productData);
+            toast.promise(
+                addDoc(collection(db, 'products'), productData),
+                {
+                    loading: 'Saving product...',
+                    success: 'Product saved successfully.',
+                    error: 'Error saving product'
+                }
+            );
             clearForm();
             toast.success('Product saved successfully.')
         } catch (error) {
